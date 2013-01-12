@@ -408,13 +408,14 @@ get_path_for_broker_topics() ->
 
 
 
-produce_message (X, Magic, Compression) -> 
-           MessageLength = 1+1+4+size(X), 
-           CheckSum = erlang:crc32(X),  
+produce_message (X, Magic, _Compression) -> 
+           MessageLength = 1+4+size(X), 
+           CheckSum = erlang:crc32(X),
+    io:format("checksum ~p~n", [CheckSum]),
            <<
                MessageLength:32/integer, 
                Magic:8/integer,
-	       Compression:8/integer, 
+	       %Compression:8/integer, 
                CheckSum:32/integer, 
                X/binary
             >>.
@@ -449,7 +450,7 @@ size_multi_produce_tpms(TopicPartitionMessages) ->
 size_of_produce_messages(Messages) -> 
     lists:foldl(fun (X, Size) -> 
 
-                                 Size + 4 + 1 + 1 + 4 + size(X)
+                                 Size + 4 + 1 + 4 + size(X)
                  end, 
                                  0, 
 				 Messages).
